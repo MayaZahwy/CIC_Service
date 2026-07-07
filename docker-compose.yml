@@ -1,0 +1,40 @@
+services:
+  python-service:
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    container_name: python-app
+    ports:
+      - "5002:5002"
+    networks:
+      - microservices-network
+
+  dotnet-service:
+    build:
+      context: ./dotnet-service
+      dockerfile: Dockerfile
+    container_name: dotnet-app
+    ports:
+      - "5001:5001"
+    networks:
+      - microservices-network
+
+  nodejs-service:
+    build:
+      context: ./nodejs-service
+      dockerfile: Dockerfile
+    container_name: nodejs-app
+    ports:
+      - "3000:3000"
+    environment:
+      - PYTHON_SERVICE_URL=http://python-service:5002/api/python
+      - DOTNET_SERVICE_URL=http://dotnet-service:5001/weatherforecast
+    depends_on:
+      - python-service
+      - dotnet-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
